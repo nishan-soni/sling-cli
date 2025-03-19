@@ -94,6 +94,17 @@ func (conn *SnowflakeConn) Init() error {
 		conn.SetProp("encoded_private_key", encPK)
 	}
 
+	if internalStage := conn.GetProp("internal_stage"); internalStage != "" {
+
+		snowflakeStage := Table{
+			Schema:  conn.GetProp("schema"),
+			Name:    internalStage,
+			Dialect: dbio.TypeDbSnowflake,
+		}
+
+		conn.SetProp("internal_stage", snowflakeStage.FullName())
+	}
+
 	instance := Connection(conn)
 	conn.BaseConn.instance = &instance
 
@@ -198,7 +209,7 @@ createNew:
 		conn.SetProp("internal_stage", defStaging.FullName())
 	} else {
 		defStaging, _ := ParseTableName(internalStage, dbio.TypeDbSnowflake)
-		if defStaging.Schema != schema {
+		if !strings.EqualFold(defStaging.Schema, schema) {
 			// create new staging if schema is different
 			internalStage = ""
 			goto createNew
