@@ -95,13 +95,11 @@ func (conn *SnowflakeConn) Init() error {
 	}
 
 	if internalStage := conn.GetProp("internal_stage"); internalStage != "" {
-
 		snowflakeStage := Table{
 			Schema:  conn.GetProp("schema"),
 			Name:    internalStage,
 			Dialect: dbio.TypeDbSnowflake,
 		}
-
 		conn.SetProp("internal_stage", snowflakeStage.FullName())
 	}
 
